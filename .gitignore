@@ -1,0 +1,79 @@
+# ----------------------------
+# Python
+# ----------------------------
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+app.log
+
+# ----------------------------
+# Virtual Environments
+# ----------------------------
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ----------------------------
+# Distribution / packaging
+# ----------------------------
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+*.zip
+
+# ----------------------------
+# PyInstaller
+# ----------------------------
+# файлы сборки PyInstaller
+*.spec
+*.manifest
+*.exe
+*.dll
+*.pyz
+
+# ----------------------------
+# Logs and databases
+# ----------------------------
+*.log
+*.sqlite3
+*.db
+*.bak
+
+# ----------------------------
+# IDEs / Editors
+# ----------------------------
+# VSCode
+.vscode/
+.history/
+# PyCharm
+.idea/
+*.iml
+
+# ----------------------------
+# OS files
+# ----------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----------------------------
+# Jupyter Notebook
+# ----------------------------
+.ipynb_checkpoints
+
+# ----------------------------
+# Optional: Test / coverage
+# ----------------------------
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+htmlcov/
