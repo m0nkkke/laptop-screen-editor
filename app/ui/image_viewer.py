@@ -214,37 +214,52 @@ class EditableGraphicsView(QGraphicsView):
             super().wheelEvent(event)
     
     def mousePressEvent(self, event):
-        """Обработка нажатия мыши"""
-        # Средняя кнопка мыши (колесо) - начало перемещения
-        if event.button() == Qt.MouseButton.MiddleButton:
-            self.panning = True
-            self.pan_start_pos = event.pos()
-            self.viewport().setCursor(Qt.CursorShape.ClosedHandCursor)
-            event.accept()
-            return
-        
-        if not self.parent_viewer or not self.parent_viewer.editing_mode or not self.parent_viewer.current_polygon:
-            return super().mousePressEvent(event)
-        
-        scene_pos = self.mapToScene(event.pos())
-        
-        # Поиск ближайшей точки
-        min_dist = float('inf')
-        closest_idx = None
-        
-        for i, point in enumerate(self.parent_viewer.current_polygon.points):
-            dist = ((point.x - scene_pos.x()) ** 2 + (point.y - scene_pos.y()) ** 2) ** 0.5
-            if dist < min_dist and dist < 15:
-                min_dist = dist
-                closest_idx = i
-        
-        if closest_idx is not None:
-            self.dragging_point = closest_idx
-            self.parent_viewer.dragging_point = closest_idx
-            self.viewport().setCursor(Qt.CursorShape.ClosedHandCursor)
-            event.accept()
-        else:
-            super().mousePressEvent(event)
+            """Обработка нажатия мыши"""
+            if event.button() == Qt.MouseButton.MiddleButton:
+                self.panning = True
+                self.pan_start_pos = event.pos()
+                self.viewport().setCursor(Qt.CursorShape.ClosedHandCursor)
+                event.accept()
+                return
+            
+            if not self.parent_viewer or not self.parent_viewer.editing_mode or not self.parent_viewer.current_polygon:
+                return super().mousePressEvent(event)
+            
+            scene_pos = self.mapToScene(event.pos())
+            
+            min_dist = float('inf')
+            closest_idx = None
+            
+            for i, point in enumerate(self.parent_viewer.current_polygon.points):
+                dist = ((point.x - scene_pos.x()) ** 2 + (point.y - scene_pos.y()) ** 2) ** 0.5
+                if dist < min_dist and dist < 15:
+                    min_dist = dist
+                    closest_idx = i
+            
+            if closest_idx is not None:
+                if event.button() == Qt.MouseButton.RightButton:
+                    # Нельзя удалять если точек меньше 4 (минимум для полигона)
+                    if len(self.parent_viewer.current_polygon.points) <= 3:
+                        from PySide6.QtWidgets import QToolTip
+                        QToolTip.showText(
+                            event.globalPosition().toPoint(),
+                            "Нельзя удалить точку: минимум 3 точки",
+                            self
+                        )
+                        event.accept()
+                        return
+                    
+                    del self.parent_viewer.current_polygon.points[closest_idx]
+                    self.parent_viewer.display_polygon(self.parent_viewer.current_polygon)
+                    logger.info(f"Удалена точка {closest_idx}, осталось точек: {len(self.parent_viewer.current_polygon.points)}")
+                    event.accept()
+                elif event.button() == Qt.MouseButton.LeftButton:
+                    self.dragging_point = closest_idx
+                    self.parent_viewer.dragging_point = closest_idx
+                    self.viewport().setCursor(Qt.CursorShape.ClosedHandCursor)
+                    event.accept()
+            else:
+                super().mousePressEvent(event)
     
     def mouseMoveEvent(self, event):
         """Обработка перемещения мыши"""
