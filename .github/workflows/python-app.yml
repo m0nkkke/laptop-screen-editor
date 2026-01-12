@@ -1,0 +1,36 @@
+name: Build EXE (Poetry)
+
+on:
+  push:
+    tags: ['v*'] # Сборка запускается при пуше тега v0.1.0 и т.д.
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install Dependencies
+        run: |
+          poetry install --with dev
+          # Если ML группа нужна в exe, раскомментируй ниже:
+          # poetry install --with dev,ml
+
+      - name: Build with PyInstaller
+        run: poetry run pyinstaller --onefile --windowed --name "laptop-screen-editor" app/main.py 
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/laptop-screen-editor.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
